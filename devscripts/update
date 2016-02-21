@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use App::CreateAcmeCPANListsImportModules;
+use Perinci::Sub::Util qw(gen_curried_sub);
+use Perinci::CmdLine::Any;
+
+gen_curried_sub(
+    'App::CreateAcmeCPANListsImportModules::create_acme_cpanlists_import_modules',
+    {
+        modules => [
+            {
+                name => 'Serialization',
+                url => 'http://blogs.perl.org/users/steven_haryanto/2010/09/comparison-of-perl-serialization-modules.html',
+                summary => 'Comparison of Perl serialization modules (2010)',
+                note => <<'_',
+
+=over
+
+=item * [2016-02-21] L<Sereal> is mentioned in the comments.
+
+=item * [2016-02-21] After this article was written, I have also published: L<Data::Dmp>.
+
+=back
+
+_
+            },
+            {
+                name => 'INI',
+                url => 'http://blogs.perl.org/users/steven_haryanto/2010/11/comparison-of-ini-format-modules-on-cpan.html',
+                summary => 'Comparison of INI-format modules on CPAN (2010)',
+                note => <<'_',
+
+=over
+
+=item * [2016-02-21] After this article was written, I have also published: L<IOD>, L<Config::IOD>, L<Config::IOD::Reader>.
+
+=back
+
+_
+            },
+        ],
+        namespace => 'Acme::CPANLists::Import::SHARYANTO',
+        dist_dir => "$Bin/..",
+    },
+    'app',
+);
+
+Perinci::CmdLine::Any->new(
+    url => '/main/app',
+    log => 1,
+)->run;
