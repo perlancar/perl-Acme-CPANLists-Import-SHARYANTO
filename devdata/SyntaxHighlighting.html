@@ -1,0 +1,633 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <title>The sad state of syntax highlighting libraries on CPAN | Of course I still use Perl [blogs.perl.org]</title>
+    <meta name="generator" content="Movable Type Pro 4.38" />
+    
+
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+    <link href="http://blogs.perl.org/users/steven_haryanto/styles/reset.css" rel="stylesheet" type="text/css" />
+    <link href="http://blogs.perl.org/users/steven_haryanto/styles/base.css" rel="stylesheet" type="text/css" />
+    <link href="http://blogs.perl.org/mt/mt-static/plugins/GCPrettify/prettify.css" rel="stylesheet" type="text/css" />
+    <link rel="alternate" type="application/atom+xml" title="Entries" href="http://blogs.perl.org/users/steven_haryanto/atom.xml" />
+
+    <link rel="start" href="http://blogs.perl.org/users/steven_haryanto/" title="Home" />
+    <script type="text/javascript" src="http://blogs.perl.org/users/steven_haryanto/mt.js"></script>
+    <script type="text/javascript" src="http://blogs.perl.org/mt/mt-static/plugins/GCPrettify/prettify.js"></script>
+    <script type="text/javascript">mtAttachEvent('load', prettyPrint);</script>
+    <!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html">
+<dc:title>The sad state of syntax highlighting libraries on CPAN</dc:title>
+<dc:description>I just posted reviews of several code syntax highlighting libraries on CPAN. In short, most of them are crap and there is nothing remotely similar to Python&apos;s Pygments or Ruby&apos;s coderay (oh how the mighty CPAN has fallen). I found...</dc:description>
+<dc:creator>Steven Haryanto</dc:creator>
+<dc:date>2012-11-16T07:58:59+07:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+    
+
+
+    
+    <link rel="prev bookmark" href="http://blogs.perl.org/users/steven_haryanto/2012/11/writing-version-of-dependencies.html" title="Writing version of dependencies" />
+    <link rel="next bookmark" href="http://blogs.perl.org/users/steven_haryanto/2012/11/categorizing-cpan-modules.html" title="Categorizing CPAN modules" />
+    
+    
+
+</head>
+<body class="">
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-56332-48']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+    <div id="container">
+    <div id="container-inner" class="pkg">
+        <div id="global-nav">
+        <div id="global-nav-inner">
+            <div id="global-nav-search">
+                <form method="get" action="http://blogs.perl.org/mt/mt-search.fcgi">
+                    <input type="hidden" name="limit" value="20" />
+                    <label for="search">Search</label>
+                    <input id="global-search" class="query" name="search" value="Search blogs.perl.org" onfocus="cleanGlobalSearch();" />
+                    <input class="submit" type="submit" value="Go" />
+                </form>
+            </div><!-- #global-nav-search -->
+
+            <ul id="global-nav-links">
+                <li><a href="/">blogs.perl.org</a></li>
+                <li><a href="http://www.perl.org/">perl.org</a></li>
+                <li><a href="http://perlnews.org/">perlnews.org</a></li>
+                <li><a href="http://www.pm.org/">pm.org</a></li>
+		<li id="navbar-signin-widget">
+<span id="navbar-signin-widget-content" class="widget-content"></span>
+</li>
+<script type="text/javascript">
+/* <![CDATA[ */
+mtAttachEvent('usersignin', mtUpdateNavbarSignInWidget);
+mtUpdateNavbarSignInWidget();
+/* ]]> */
+</script>
+            </ul><!-- #global-nav-links -->
+        </div><!-- #global-nav-inner -->
+        </div><!-- #global-nav -->
+        
+
+
+        
+        <div id="header" class="pkg">
+        <div id="header-inner">
+            <h1 id="site-title"><a href="http://blogs.perl.org/users/steven_haryanto/" accesskey="1">Of course I still use Perl</a></h1>
+            <div id="site-description">Adventures in Perl, which I have been in love-hate-love relationship with for more than a decade. A language that is dead, undead, alive, and above all: damn useful.</div>
+        </div><!-- #header-inner -->
+        </div><!-- #header -->
+        
+        <div id="content">
+        <div id="content-inner" class="pkg">
+            <div id="content-main">
+            
+
+
+<div class="entry" id="entry-4049">
+                        <h2 class="entry-title">The sad state of syntax highlighting libraries on CPAN</h2>
+                        
+                        <div class="entry-meta-1 pkg">
+                            <span class="byline">By <a href="http://blogs.perl.org/users/steven_haryanto/" class="profile-link">Steven Haryanto</a></span>
+							<span class="dateline">on <span class="date" title="iso8601">November 16, 2012  7:58 AM</span></span>
+							
+						</div><!-- .entry-meta -->
+                        
+                        <div class="entry-body">
+                            <p>I just posted <a href="http://cpanratings.perl.org/user/stevenharyanto">reviews</a> of several code syntax highlighting libraries on CPAN. In short, most of them are crap and there is nothing remotely similar to Python's <a href="http://pygments.org/">Pygments</a> or Ruby's <a href="http://coderay.rubychan.de/">coderay</a> (oh how the mighty CPAN has fallen). I found that <a href="http://metacpan.org/module/Source::SyntaxHighlight">Syntax::SourceHighlight</a>, a Perl interface to <a href="http://www.gnu.org/software/src-highlite/">GNU Source-highlight</a>, is the only usable one. One downside is just that I need to pull over 100MB-worth of Debian packages to have it installed, a huge dependency especially since my original requirement is merely to colorize the terminal output of some JSON and YAML. And it's too bad that it doesn't support YAML out-of-the-box yet. So I don't plan on using it anytime soon.</p>
+
+<p>Currently I'm investigating (via the <a href="http://stackoverflow.com/questions/13408134/utilizing-emacs-or-vims-syntax-highlighter-for-command-line-program">lazy web</a>) utilizing emacs'/vim's syntax-highlighting capability. It's a good bet that one of those two editors are available on a standard Linux box. A pure-Perl library would be ideal though.</p>
+
+<p><br />
+</p>
+                            
+                        </div><!-- .entry-body -->
+                        
+                        <div class="entry-meta-2 pkg">
+                            <ul>
+                                <li><a href="#comments">11 comments</a></li>
+                                <!-- <li><a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html">0 votes</a></li> -->
+                            </ul>
+                        </div>
+                    </div><!-- #entry-4049 -->
+                    
+
+
+
+
+
+<div id="comments" class="comments">
+
+
+    
+    
+        
+    <h2 class="comments-header">11 Comments</h2>
+    
+    <div id="comments-content" class="comments-content" style="clear: left;">
+        
+        <div id="comment-233635" class="comment entry-author-comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Steven Haryanto</span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-233635"><abbr class="published" title="2012-11-16T10:46:52+07:00">November 16, 2012 10:46 AM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(233635, 'Steven Haryanto')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>BTW, I've just hacked and released <a href="http://metacpan.org/dist/JSON-Color">JSON::Color</a> and <a href="http://metacpan.org/dist/YAML-Tiny-Color">YAML::Tiny::Color</a> to fulfill my specific needs.</p>
+
+<p>Darn, The MT won't show images in comments. <a href="/users/steven_haryanto/json-color.png">json-color.png</a>.<br />
+</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-233852" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <a class="commenter-profile" href="http://tobyinkster.co.uk/"><img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" /></a>
+
+                    <span class="vcard author"><a title="http://tobyinkster.co.uk/" href="http://tobyinkster.co.uk/">Toby Inkster</a></span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-233852"><abbr class="published" title="2012-11-16T16:57:16+07:00">November 16, 2012  4:57 PM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(233852, 'Toby Inkster')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>I rather like <a href="https://metacpan.org/release/Syntax-Highlight-Engine-Kate">Syntax-Highlight-Engine-Kate</a>. Some languages are better highlighted than others, but it does the job for me.</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-233861" class="comment comment-reply entry-author-comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Steven Haryanto</span> replied to <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-233852">comment from Toby Inkster</a>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-233861"><abbr class="published" title="2012-11-16T17:09:34+07:00">November 16, 2012  5:09 PM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(233861, 'Steven Haryanto')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>Yeah, but did you also notice how slow it is?<br />
+</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-234040" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Ben Bullock</span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-234040"><abbr class="published" title="2012-11-16T22:29:16+07:00">November 16, 2012 10:29 PM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(234040, 'Ben Bullock')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>Hi Steven,</p>
+
+<p>Talking about Emacs, here is a "weirdo" distribution of mine on github:</p>
+
+<p><a href="https://github.com/benkasminbullock/Emacs-HTMLize">https://github.com/benkasminbullock/Emacs-HTMLize</a></p>
+
+<p>This is what I use to make the syntax highlighting on my website, like the following:</p>
+
+<p><a href="http://www.lemoda.net/perl/hash-ref-or-copy/index.html">http://www.lemoda.net/perl/hash-ref-or-copy/index.html</a><br />
+<a href="http://www.lemoda.net/images/sizes/index.html">http://www.lemoda.net/images/sizes/index.html</a></p>
+
+<p><br />
+It is really slow and not conceptually great, which is why it is not released to CPAN. There are all sorts of reasons for that code being like that, most of which I don't remember. One problem was making it run without a terminal process, since Emacs doesn't usually bother doing the syntax highlighting unless there is a controlling terminal. I got the idea to use "expect" from Stackoverflow. But it is very good at adapting to any language, e.g. I can write a program in Octave or JavaScript and it "just works":</p>
+
+<p><a href="http://www.lemoda.net/games/othello/index.html">http://www.lemoda.net/games/othello/index.html</a><br />
+<a href="http://www.lemoda.net/octave/normal-probability/index.html">http://www.lemoda.net/octave/normal-probability/index.html</a></p>
+
+<p>I also have a module which is specifically for C programs:</p>
+
+<p><a href="https://metacpan.org/release/C-Tokenize">https://metacpan.org/release/C-Tokenize</a></p>
+
+<p>There is a script included in the distribution:</p>
+
+<p><a href="https://metacpan.org/module/c2html">https://metacpan.org/module/c2html</a></p>
+
+<p>This is quite fast, faster than running an Emacs process and then killing it again.</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-234091" class="comment comment-reply entry-author-comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Steven Haryanto</span> replied to <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-234040">comment from Ben Bullock</a>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-234091"><abbr class="published" title="2012-11-17T00:06:40+07:00">November 17, 2012 12:06 AM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(234091, 'Steven Haryanto')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>Hi Ben,</p>
+
+<p>Thanks. Someone at SO also pointed out about a similar command htmlfontify-buffer. I played around with it a bit. It's a bit painful, like you said. And it's not exactly what I need because I want ANSI escapes output and not HTML.</p>
+
+<p>My current favorite is Syntax::SourceHighlight, since it's fast and covers a lot of languages (YAML is not yet in the list though) and output formats (ANSI escape and HTML are supported, among others).</p>
+
+<p>My current needs is so far met with the two modules I wrote today. They're not exactly syntax highlighters, more like dumper (with fixed formatting) but it's just what I need.</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-234381" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Ben Bullock</span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-234381"><abbr class="published" title="2012-11-17T13:22:26+07:00">November 17, 2012  1:22 PM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(234381, 'Ben Bullock')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <blockquote>
+And it's not exactly what I need because I want ANSI escapes output and not HTML.
+</blockquote>
+Oh come on, that is about one line of Perl:
+<pre>
+my %ht = (
+'htmltag' => "\x0g",
+);
+my $regex =  (join '|', keys %ht) ;
+my $text =~ s/($regex)/$ht{$1}/;
+</pre>
+
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-237735" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <a class="commenter-profile" href="http://www.leonerd.org.uk/"><img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" /></a>
+
+                    <span class="vcard author"><a title="http://www.leonerd.org.uk/" href="http://www.leonerd.org.uk/" rel="nofollow">Paul &quot;LeoNerd&quot; Evans</a></span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-237735"><abbr class="published" title="2012-11-22T21:59:51+07:00">November 22, 2012  9:59 PM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(237735, 'Paul \&amp;quot;LeoNerd\&amp;quot; Evans')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>I keep meaning to write an article/example/description/something on how you can use Parser::MGC to parse up the input text and yield a syntax tree annotated to give the positions it found the various constructs in the input. This would make it easy to drive a syntax highlight engine from it.</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-240543" class="comment comment-reply entry-author-comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Steven Haryanto</span> replied to <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-234381">comment from Ben Bullock</a>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-240543"><abbr class="published" title="2012-11-27T07:46:14+07:00">November 27, 2012  7:46 AM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(240543, 'Steven Haryanto')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>You're right! Maybe using vim is viable after all (emacs is currently out of the question though, its startup overhead is too much).</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-248382" class="comment comment-reply entry-author-comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Steven Haryanto</span> replied to <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-237735">comment from Paul "LeoNerd" Evans</a>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-248382"><abbr class="published" title="2012-12-06T11:19:16+07:00">December  6, 2012 11:19 AM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(248382, 'Steven Haryanto')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>Hoping Parser::MGC (or Marpa, or whatever) will help form a basis for the next Perl syntax highlighting library project :)<br />
+</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-403346" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <a class="commenter-profile" href="http://tobyinkster.co.uk/"><img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" /></a>
+
+                    <span class="vcard author"><a title="http://tobyinkster.co.uk/" href="http://tobyinkster.co.uk/">Toby Inkster</a></span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-403346"><abbr class="published" title="2013-03-13T05:47:50+07:00">March 13, 2013  5:47 AM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(403346, 'Toby Inkster')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>PPI::HTML is very, very good, but only highlights Perl code of course.</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-1468949" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Roland Minner</span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html#comment-1468949"><abbr class="published" title="2014-11-29T22:16:04+07:00">November 29, 2014 10:16 PM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(1468949, 'Roland Minner')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            Not a Perl solution, but i typically use vim to get syntax highlighting for code which i post on websites:
+<pre>
+vim -f +"syntax on" +"TOhtml" +"wq" +"q" myscript.pl
+</pre>
+
+<p>This will create a html file with syntax highlighting and quit right afterwards.</p>
+        </div>
+    </div>
+</div>
+        
+    </div>
+        
+    
+    
+
+    
+    
+    <div class="comments-open" id="comments-open">
+        <h2 class="comments-open-header">Leave a comment</h2>
+        <div class="comments-open-content">
+
+        
+            <div id="comment-greeting"></div>
+
+            <form method="post" action="http://blogs.perl.org/mt/mt-comments.fcgi" name="comments_form" id="comments-form" onsubmit="return mtCommentOnSubmit(this)">
+                <input type="hidden" name="static" value="1" />
+                <input type="hidden" name="entry_id" value="4049" />
+                <input type="hidden" name="__lang" value="en" />
+                <input type="hidden" name="parent_id" value="" id="comment-parent-id" />
+                <input type="hidden" name="armor" value="1" />
+                <input type="hidden" name="preview" value="" />
+                <input type="hidden" name="sid" value="" />
+                <div id="comments-open-data">
+                    <div id="comment-form-name">
+                        <label for="comment-author">Name</label>
+                        <input id="comment-author" name="author" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-email">
+                        <label for="comment-email">Email Address</label>
+                        <input id="comment-email" name="email" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-url">
+                        <label for="comment-url">URL</label>
+                        <input id="comment-url" name="url" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-remember-me">
+                        <input type="checkbox" id="comment-bake-cookie" name="bakecookie" onclick="mtRememberMeOnClick(this)" value="1" accesskey="r" />
+                        <label for="comment-bake-cookie">Remember personal info?</label>
+                    </div>
+                </div>
+                <div id="comment-form-reply" style="display:none">
+                    <input type="checkbox" id="comment-reply" name="comment_reply" value="" onclick="mtSetCommentParentID()" />
+                    <label for="comment-reply" id="comment-reply-label"></label>
+                </div>
+                <div id="comments-open-text">
+                    <label for="comment-text">Comments
+                    (You may use HTML tags for style)</label>
+                    <textarea id="comment-text" name="text" rows="15" cols="50" onfocus="mtCommentFormOnFocus()"></textarea>
+                </div>
+                <div id="comments-open-captcha"></div>
+                <div id="comments-open-footer">
+                    <input type="submit" accesskey="v" name="preview_button" id="comment-preview" value="Preview" onclick="this.form.preview.value='1';" />
+                    <input type="submit" accesskey="s" name="post" id="comment-submit" value="Submit" />
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+    <script type="text/javascript">
+    <!--
+    mtAttachEvent("load", mtEntryOnLoad);
+    mtAttachEvent("unload", mtEntryOnUnload);
+    //-->
+    </script>
+    
+
+
+</div>
+
+
+
+</div><!-- #content-main -->
+            
+            <div id="content-aux">
+            
+                
+                <div class="module-aux pkg" id="module-aux-about-author-351">
+                <div class="module-inner">
+                    <h3>About Steven Haryanto</h3>
+                    <p><img class="authorpic" src="http://blogs.perl.org/mt/mt-static/support/assets_c/2012/08/gravatar-sharyanto-thumb-72x72-879.png" alt="user-pic" />
+	            A programmer (mostly Perl 5 nowadays).
+
+My CPAN ID: SHARYANTO. I'm sedusedan on perlmonks. My twitter is stevenharyanto (but I don't tweet much). Follow me on github: sharyanto.</p>
+                    <div class="more-link"><a href="http://blogs.perl.org/mt/mt-cp.fcgi?__mode=view&amp;id=351">More info &raquo;</a></div>
+                </div>
+                </div><!-- #module-aux-about-author -->
+
+
+
+
+                
+            
+            
+            <div class="module-aux pkg" id="module-aux-search">
+                <div class="module-inner">
+                    
+                    
+                    <h3>Search this blog</h3>
+                    
+                    
+					
+                    <div id="search-form-aux">
+                        <form method="get" action="http://blogs.perl.org/mt/mt-search.fcgi">
+                    
+                            <input type="hidden" name="IncludeBlogs" value="197" />
+                    
+                            <input type="hidden" name="limit" value="20" />
+                            <label for="search">Search</label>
+                            <input id="local-search" class="query" name="search" value="" />
+                            <input class="submit" type="submit" value="Go" />
+                        </form>
+                    </div><!-- #search-form-aux -->
+                </div>
+                </div><!-- #module-aux-search -->
+                    
+
+            
+            
+                
+                
+                
+                
+            
+
+            </div><!-- #content-aux -->
+
+
+
+        </div><!-- #content-inner -->
+        </div><!-- #content -->
+
+        <div id="footer">
+        <div id="footer-inner" class="pkg">
+            <ul>
+                <li class="first"><a href="http://github.com/blogs-perl-org/blogs.perl.org/issues">Feedback welcome</a></li>
+                <li>Hosted by <a href="http://dave.org.uk">Dave Cross</a> of <a href="http://mag-sol.com/">Magnum Solutions</a> and <a href="http://aaroncrane.co.uk/">Aaron Crane</a> of <a href="http://cutbot.net/">Cutbot</a></li>
+            </ul>
+            <ul>
+                <li class="first">Free blog hosting for users of the <a href="http://perl.org">Perl Programming Language</a></li>
+            </ul> 
+
+            <div class="powered-by"><a href="http://www.movabletype.com/" target="_blank">Powered by Movable Type</a></div>
+        </div><!-- #footer-inner -->
+        </div><!-- #footer -->
+            
+        </div><!-- #content-inner -->
+        </div><!-- #content -->
+        
+    </div><!-- #container-inner -->
+    </div><!-- #container -->
+
+    
+
+</body>
+</html>
+
+
+
+
+

@@ -16,6 +16,7 @@ gen_curried_sub(
             {
                 name => 'Serialization',
                 url => 'http://blogs.perl.org/users/steven_haryanto/2010/09/comparison-of-perl-serialization-modules.html',
+                extract_opts => {from_text=>1},
                 summary => 'Comparison of Perl serialization modules (2010)',
                 note => <<'_',
 
@@ -23,7 +24,7 @@ gen_curried_sub(
 
 =item * [2016-02-21] L<Sereal> is mentioned in the comments.
 
-=item * [2016-02-21] After this article was written, I have also published: L<Data::Dmp>.
+=item * [2016-02-21] Since this article was written, I have also published: L<Data::Dmp>.
 
 =back
 
@@ -37,11 +38,40 @@ _
 
 =over
 
-=item * [2016-02-21] After this article was written, I have also published: L<IOD>, L<Config::IOD>, L<Config::IOD::Reader>.
+=item * [2016-02-21] Since this article was written, I have also published: L<IOD>, L<Config::IOD>, L<Config::IOD::Reader>.
 
 =back
 
 _
+            },
+            {
+                name => 'LoggingFrameworks',
+                url => 'http://blogs.perl.org/users/steven_haryanto/2010/11/short-grossly-incomplete-comparison-of-perl-logging-frameworks.html',
+                summary => '(Short, grossly incomplete) comparison of Perl logging frameworks (2010)',
+                note => <<'_',
+
+=over
+
+=item * [2016-02-21] Since this article was written, I have also published: L<Log::Any::App>, and plan to release L<Log::Gurat>.
+
+=back
+
+_
+            },
+            {
+                name => 'IndonesianLanguage',
+                url => 'http://blogs.perl.org/users/steven_haryanto/2012/08/cpan-modules-for-the-indonesian-language.html',
+                summary => 'CPAN modules for the Indonesian language (2012)',
+            },
+            {
+                name => 'SyntaxHighlighting',
+                url => 'http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html',
+                summary => 'The sad state of syntax highlighting libraries on CPAN (2012)',
+            },
+            {
+                name => 'TextTables',
+                url => 'http://blogs.perl.org/users/steven_haryanto/2014/07/benchmarking-several-ascii-table-generator-modules.html',
+                summary => 'Benchmarking several ASCII-table-generator modules (2014)',
             },
         ],
         namespace => 'Acme::CPANLists::Import::SHARYANTO',

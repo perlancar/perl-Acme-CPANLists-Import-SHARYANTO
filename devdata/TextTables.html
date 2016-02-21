@@ -1,0 +1,542 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <title>Benchmarking several ASCII-table-generator modules | Of course I still use Perl [blogs.perl.org]</title>
+    <meta name="generator" content="Movable Type Pro 4.38" />
+    
+
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+    <link href="http://blogs.perl.org/users/steven_haryanto/styles/reset.css" rel="stylesheet" type="text/css" />
+    <link href="http://blogs.perl.org/users/steven_haryanto/styles/base.css" rel="stylesheet" type="text/css" />
+    <link href="http://blogs.perl.org/mt/mt-static/plugins/GCPrettify/prettify.css" rel="stylesheet" type="text/css" />
+    <link rel="alternate" type="application/atom+xml" title="Entries" href="http://blogs.perl.org/users/steven_haryanto/atom.xml" />
+
+    <link rel="start" href="http://blogs.perl.org/users/steven_haryanto/" title="Home" />
+    <script type="text/javascript" src="http://blogs.perl.org/users/steven_haryanto/mt.js"></script>
+    <script type="text/javascript" src="http://blogs.perl.org/mt/mt-static/plugins/GCPrettify/prettify.js"></script>
+    <script type="text/javascript">mtAttachEvent('load', prettyPrint);</script>
+    <!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://blogs.perl.org/users/steven_haryanto/2014/07/benchmarking-several-ascii-table-generator-modules.html">
+<dc:title>Benchmarking several ASCII-table-generator modules</dc:title>
+<dc:description>UPDATE #1 2014-07-11: Added Catmandu::Exporter::Table. This module is not exactly lightweight, so I will not consider it for usage in Perinci::CmdLine::Lite, but it&apos;s interesting to benchmark anyway. UPDATE #2 2014-07-11: Nudged by me, Jakob extracted the table-generating functionality of Catmandu::Exporter::Table...</dc:description>
+<dc:creator>Steven Haryanto</dc:creator>
+<dc:date>2014-07-10T15:19:27+07:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+    
+
+
+    
+    <link rel="prev bookmark" href="http://blogs.perl.org/users/steven_haryanto/2014/06/skipping-large-files-when-mirroring-your-mini-cpan.html" title="Skipping large files when mirroring your mini CPAN" />
+    <link rel="next bookmark" href="http://blogs.perl.org/users/steven_haryanto/2014/07/some-statistics-from-debian-package-tags.html" title="Some statistics from Debian package tags" />
+    
+    
+
+</head>
+<body class="">
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-56332-48']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+    <div id="container">
+    <div id="container-inner" class="pkg">
+        <div id="global-nav">
+        <div id="global-nav-inner">
+            <div id="global-nav-search">
+                <form method="get" action="http://blogs.perl.org/mt/mt-search.fcgi">
+                    <input type="hidden" name="limit" value="20" />
+                    <label for="search">Search</label>
+                    <input id="global-search" class="query" name="search" value="Search blogs.perl.org" onfocus="cleanGlobalSearch();" />
+                    <input class="submit" type="submit" value="Go" />
+                </form>
+            </div><!-- #global-nav-search -->
+
+            <ul id="global-nav-links">
+                <li><a href="/">blogs.perl.org</a></li>
+                <li><a href="http://www.perl.org/">perl.org</a></li>
+                <li><a href="http://perlnews.org/">perlnews.org</a></li>
+                <li><a href="http://www.pm.org/">pm.org</a></li>
+		<li id="navbar-signin-widget">
+<span id="navbar-signin-widget-content" class="widget-content"></span>
+</li>
+<script type="text/javascript">
+/* <![CDATA[ */
+mtAttachEvent('usersignin', mtUpdateNavbarSignInWidget);
+mtUpdateNavbarSignInWidget();
+/* ]]> */
+</script>
+            </ul><!-- #global-nav-links -->
+        </div><!-- #global-nav-inner -->
+        </div><!-- #global-nav -->
+        
+
+
+        
+        <div id="header" class="pkg">
+        <div id="header-inner">
+            <h1 id="site-title"><a href="http://blogs.perl.org/users/steven_haryanto/" accesskey="1">Of course I still use Perl</a></h1>
+            <div id="site-description">Adventures in Perl, which I have been in love-hate-love relationship with for more than a decade. A language that is dead, undead, alive, and above all: damn useful.</div>
+        </div><!-- #header-inner -->
+        </div><!-- #header -->
+        
+        <div id="content">
+        <div id="content-inner" class="pkg">
+            <div id="content-main">
+            
+
+
+<div class="entry" id="entry-6209">
+                        <h2 class="entry-title">Benchmarking several ASCII-table-generator modules</h2>
+                        
+                        <div class="entry-meta-1 pkg">
+                            <span class="byline">By <a href="http://blogs.perl.org/users/steven_haryanto/" class="profile-link">Steven Haryanto</a></span>
+							<span class="dateline">on <span class="date" title="iso8601">July 10, 2014  3:19 PM</span></span>
+							
+						</div><!-- .entry-meta -->
+                        
+                        <div class="entry-body">
+                            <p><b>UPDATE #1 2014-07-11:</b> Added <a href="https://metacpan.org/pod/Catmandu::Exporter::Table">Catmandu::Exporter::Table</a>. This module is not exactly lightweight, so I will not consider it for usage in Perinci::CmdLine::Lite, but it's interesting to benchmark anyway.</p>
+
+<p><b>UPDATE #2 2014-07-11:</b> Nudged by me, Jakob extracted the table-generating <br />
+functionality of Catmandu::Exporter::Table into its own module <a href="https://metacpan.org/pod/Text::MarkdownTable">Text::MarkdownTable</a>. This module depends on nothing but Moo. Great job Jakob. Although for my particular project Perinci::CmdLine::Lite, I declared that <i>Moo is a bit too heavy</i>, and so excluded it. :)</p>
+
+<p><b>UPDATE #3 2014-07-11:</b> Added more modules to the mix: <a href="https://metacpan.org/pod/Text::FormatTable">Text::FormatTable</a>, <a href="https://metacpan.org/pod/Text::Table::Tiny">Text::Table::Tiny</a>. Excluded more modules: <a href="https://metacpan.org/pod/Data::ShowTable">Data::ShowTable</a>, <a href="https://metacpan.org/pod/Text::UnicodeBox::Table">Text::UnicodeBox::Table</a>.</p>
+
+<p><b>UPDATE #4 2014-07-11:</b> Excluded 2 more modules: <a href="https://metacpan.org/pod/Table::Simple">Table::Simple</a>, <a href="https://metacpan.org/pod/Text::SimpleTable::AutoWidth">Text::SimpleTable::AutoWidth</a></p>
+
+<p>For my upcoming Perinci::CmdLine::Lite module, I want to use a small and fast ASCII-table-generator module to replace <a href="https://metacpan.org/pod/Text::ANSITable">Text::ANSITable</a>. That module, which I wrote, is featureful (and is currently the only CPAN module which can handle ANSI colors, wide characters, multiline text), but is horribly slow, about an order or two of magnitude slower than the other ASCII table modules because it needs to parse ASCII escape color codes in text as well as counting visual widths of characters. A C implementation for that is needed to really speed it up. When we don't care about colors (or wide characters), it's better to use the simpler and faster modules.</p>
+
+<p>Here are several which I included in this benchmark: </p>
+
+<ul>
+
+<p><li><a href="https://metacpan.org/pod/Text::ANSITable">Text::ANSITable</a></p>
+
+<p><li><a href="https://metacpan.org/pod/Text::ASCIITable">Text::ASCIITable</a></p>
+
+<p><li><a href="https://metacpan.org/pod/Text::FormatTable">Text::FormatTable</a></p>
+
+<p><li><a href="https://metacpan.org/pod/Text::MarkdownTable">Text::MarkdownTable</a></p>
+
+<p><li><a href="https://metacpan.org/pod/Text::Table">Text::Table</a></p>
+
+<p><li><a href="https://metacpan.org/pod/Text::TabularDisplay">Text::TabularDisplay</a></p>
+
+<p><li><a href="https://metacpan.org/pod/Text::Table::Tiny">Text::Table::Tiny</a></p>
+
+</ul>
+
+<p>Some of the other modules are not included:</p>
+
+<ul>
+
+<p><li><a href="https://metacpan.org/pod/Text::SimpleTable">Text::SimpleTable</a>, because it doesn't calculate column widths for us, we need to supply widths ourselves.</p>
+
+<p><li><a href="https://metacpan.org/pod/Data::ShowTable">Data::ShowTable</a>, because of the interface. The interface is, how should I say it, unfitting for the simple case of formatting an array of arrays. You have to construct a "row subroutine" which must react to a rewindable argument, and iterate the rows yourself. Plus the module is designed to print to STDOUT instead of returning the rendered string (you can use IO::Scalar or Capture::Tiny, but...)</p>
+
+<p><li><a href="https://metacpan.org/pod/Text::UnicodeBox::Table">Text::UnicodeBox::Table</a> because it's designed to use Unicode non-ASCII border characters.</p>
+
+<p><li><a href="https://metacpan.org/pod/Table::Simple">Table::Simple</a> (currently skipping Moose-using modules because startup overhead is too big)</p>
+
+<p><li><a href="https://metacpan.org/pod/Text::SimpleTable::AutoWidth">Text::SimpleTable::AutoWidth</a> (currently skipping Moose-using modules because startup overhead is too big)</p>
+
+</ul>
+
+<p>Below is the result (the code is <a href="https://github.com/sharyanto/test/blob/master/bench-table-generator-modules">here</a>):</p>
+
+<pre>Text::ANSITable:
+.--------+--------+--------.
+| col1   | col2   | col3   |
++--------+--------+--------+
+| row1.1 | row1.2 | row1.3 |
+| row2.1 | row2.2 | row2.3 |
+| row3.1 | row3.2 | row3.3 |
+| row4.1 | row4.2 | row4.3 |
+| row5.1 | row5.2 | row5.3 |
+`--------+--------+--------'
+
+<p>Text::ASCIITable:<br />
+.--------------------------.<br />
+| col1   | col2   | col3   |<br />
++--------+--------+--------+<br />
+| row1.1 | row1.2 | row1.3 |<br />
+| row2.1 | row2.2 | row2.3 |<br />
+| row3.1 | row3.2 | row3.3 |<br />
+| row4.1 | row4.2 | row4.3 |<br />
+| row5.1 | row5.2 | row5.3 |<br />
+'--------+--------+--------'</p>
+
+<p>Text::FormatTable:<br />
+col1  |col2  |col3  <br />
+row1.1|row1.2|row1.3<br />
+row2.1|row2.2|row2.3<br />
+row3.1|row3.2|row3.3<br />
+row4.1|row4.2|row4.3<br />
+row5.1|row5.2|row5.3</p>
+
+<p>Text::MarkdownTable:<br />
+| col1   | col2   | col3   |<br />
+|--------|--------|--------|<br />
+| row1.1 | row1.2 | row1.3 |<br />
+| row2.1 | row2.2 | row2.3 |<br />
+| row3.1 | row3.2 | row3.3 |<br />
+| row4.1 | row4.2 | row4.3 |<br />
+| row5.1 | row5.2 | row5.3 |</p>
+
+<p>Text::Table:<br />
+col1   col2   col3  <br />
+row1.1 row1.2 row1.3<br />
+row2.1 row2.2 row2.3<br />
+row3.1 row3.2 row3.3<br />
+row4.1 row4.2 row4.3<br />
+row5.1 row5.2 row5.3</p>
+
+<p>Text::Table::Tiny:<br />
++--------+--------+--------+<br />
+| col1   | col2   | col3   |<br />
++--------+--------+--------+<br />
+| row1.1 | row1.2 | row1.3 |<br />
+| row2.1 | row2.2 | row2.3 |<br />
+| row3.1 | row3.2 | row3.3 |<br />
+| row4.1 | row4.2 | row4.3 |<br />
+| row5.1 | row5.2 | row5.3 |<br />
++--------+--------+--------+<br />
+Text::TabularDisplay:<br />
++--------+--------+--------+<br />
+| col1   | col2   | col3   |<br />
++--------+--------+--------+<br />
+| row1.1 | row1.2 | row1.3 |<br />
+| row2.1 | row2.2 | row2.3 |<br />
+| row3.1 | row3.2 | row3.3 |<br />
+| row4.1 | row4.2 | row4.3 |<br />
+| row5.1 | row5.2 | row5.3 |<br />
++--------+--------+--------+</p>
+
+<p>0tiny(1x1) table:<br />
+                        Rate Text::ANSITable Text::ASCIITable Text::Table Text::MarkdownTable Text::FormatTable Text::TabularDisplay Text::Table::Tiny<br />
+Text::ANSITable       2732/s              --             -64%        -79%                -83%              -86%                 -91%              -96%<br />
+Text::ASCIITable      7565/s            177%               --        -43%                -53%              -60%                 -74%              -89%<br />
+Text::Table          13273/s            386%              75%          --                -17%              -30%                 -55%              -81%<br />
+Text::MarkdownTable  15999/s            486%             111%         21%                  --              -16%                 -45%              -78%<br />
+Text::FormatTable    19040/s            597%             152%         43%                 19%                --                 -35%              -73%<br />
+Text::TabularDisplay 29191/s            969%             286%        120%                 82%               53%                   --              -59%<br />
+Text::Table::Tiny    71521/s           2518%             845%        439%                347%              276%                 145%                --</p>
+
+<p>1small(3x5) table:<br />
+                        Rate Text::ANSITable Text::ASCIITable Text::FormatTable Text::Table Text::MarkdownTable Text::TabularDisplay Text::Table::Tiny<br />
+Text::ANSITable        662/s              --             -62%              -83%        -86%                -89%                 -91%              -98%<br />
+Text::ASCIITable      1744/s            163%               --              -54%        -64%                -70%                 -77%              -95%<br />
+Text::FormatTable     3828/s            478%             119%                --        -20%                -34%                 -50%              -90%<br />
+Text::Table           4799/s            624%             175%               25%          --                -17%                 -37%              -87%<br />
+Text::MarkdownTable   5784/s            773%             232%               51%         21%                  --                 -24%              -84%<br />
+Text::TabularDisplay  7658/s           1056%             339%              100%         60%                 32%                   --              -79%<br />
+Text::Table::Tiny    36654/s           5433%            2002%              857%        664%                534%                 379%                --</p>
+
+<p>2wide(30x5) table:<br />
+                       Rate Text::ANSITable Text::ASCIITable Text::FormatTable Text::Table Text::MarkdownTable Text::TabularDisplay Text::Table::Tiny<br />
+Text::ANSITable      78.5/s              --             -59%              -81%        -89%                -93%                 -94%              -99%<br />
+Text::ASCIITable      189/s            141%               --              -53%        -73%                -83%                 -85%              -97%<br />
+Text::FormatTable     403/s            413%             113%                --        -42%                -64%                 -68%              -95%<br />
+Text::Table           697/s            789%             269%               73%          --                -38%                 -45%              -91%<br />
+Text::MarkdownTable  1131/s           1341%             498%              181%         62%                  --                 -10%              -85%<br />
+Text::TabularDisplay 1260/s           1505%             566%              213%         81%                 11%                   --              -83%<br />
+Text::Table::Tiny    7473/s           9423%            3851%             1756%        972%                561%                 493%                --</p>
+
+<p>3long(3x300) table:<br />
+            (warning: too few iterations for a reliable count)<br />
+                       Rate Text::ANSITable Text::ASCIITable Text::FormatTable Text::MarkdownTable Text::TabularDisplay Text::Table Text::Table::Tiny<br />
+Text::ANSITable      16.0/s              --             -60%              -81%                -90%                 -91%        -95%              -99%<br />
+Text::ASCIITable     40.2/s            151%               --              -52%                -74%                 -76%        -87%              -97%<br />
+Text::FormatTable    84.6/s            427%             110%                --                -46%                 -50%        -72%              -94%<br />
+Text::MarkdownTable   156/s            874%             288%               85%                  --                  -8%        -48%              -90%<br />
+Text::TabularDisplay  169/s            954%             321%              100%                  8%                   --        -44%              -89%<br />
+Text::Table           301/s           1777%             649%              256%                 93%                  78%          --              -80%<br />
+Text::Table::Tiny    1537/s           9474%            3718%             1716%                883%                 808%        410%                --</p>
+
+<p>4large(30x300) table:<br />
+            (warning: too few iterations for a reliable count)<br />
+            (warning: too few iterations for a reliable count)<br />
+            (warning: too few iterations for a reliable count)<br />
+                       Rate Text::ANSITable Text::ASCIITable Text::FormatTable Text::MarkdownTable Text::TabularDisplay Text::Table Text::Table::Tiny<br />
+Text::ANSITable      1.74/s              --             -57%              -82%                -93%                 -93%        -98%              -99%<br />
+Text::ASCIITable     4.00/s            130%               --              -59%                -84%                 -85%        -95%              -98%<br />
+Text::FormatTable    9.88/s            468%             147%                --                -60%                 -62%        -88%              -96%<br />
+Text::MarkdownTable  25.0/s           1338%             525%              153%                  --                  -4%        -70%              -89%<br />
+Text::TabularDisplay 25.9/s           1391%             548%              163%                  4%                   --        -69%              -88%<br />
+Text::Table          82.5/s           4644%            1963%              735%                230%                 218%          --              -63%<br />
+Text::Table::Tiny     224/s          12766%            5494%             2165%                795%                 763%        171%                --<br />
+</pre></p>
+
+<p><b>Conclusion (2014-07-11)</b></p>
+
+<ul>
+
+<p><li>Text::Table::Tiny wins hands down and is my choice. It is very fast because it doesn't copy rows and uses a long sprintf() format to do the formatting of a whole row instead of formatting each cell separately and joining them into a row using join(). Actually earlier today I had the exact same idea *and* module name, but turned out somebody had already did it. Thanks, Creighton Higgins!</p>
+
+<p><li>Text::ANSITable is very slow and is expected. I'm including it for comparison only.</p>
+
+<p><li>Text::ASCIITable is surprisingly relatively slow, given that it doesn't do colors or wide characters or multilines. It shouldn't be much slower than, say, Text::Table or Text::TabularDisplay.</p>
+
+</ul>
+                            
+                        </div><!-- .entry-body -->
+                        
+                        <div class="entry-meta-2 pkg">
+                            <ul>
+                                <li><a href="#comments">2 comments</a></li>
+                                <!-- <li><a href="http://blogs.perl.org/users/steven_haryanto/2014/07/benchmarking-several-ascii-table-generator-modules.html">0 votes</a></li> -->
+                            </ul>
+                        </div>
+                    </div><!-- #entry-6209 -->
+                    
+
+
+
+
+
+<div id="comments" class="comments">
+
+
+    
+    
+        
+    <h2 class="comments-header">2 Comments</h2>
+    
+    <div id="comments-content" class="comments-content" style="clear: left;">
+        
+        <div id="comment-1412160" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <a class="commenter-profile" href="http://jakoblog.de/"><img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/openid_logo.png" width="16" height="16" /></a>
+
+                    <span class="vcard author"><a title="http://jakoblog.de/" href="http://jakoblog.de/" rel="nofollow">jakoblog.de</a></span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2014/07/benchmarking-several-ascii-table-generator-modules.html#comment-1412160"><abbr class="published" title="2014-07-10T19:22:11+07:00">July 10, 2014  7:22 PM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(1412160, 'jakoblog.de')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>I added <a href="https://metacpan.org/pod/Catmandu::Exporter::Table" rel="nofollow">Catmandu::Exporter::Table</a> to the comparision, see <a href="https://github.com/sharyanto/test/pull/1" rel="nofollow"><a href="https://github.com/sharyanto/test/pull/1" rel="nofollow">https://github.com/sharyanto/test/pull/1</a></a>.</p>
+        </div>
+    </div>
+</div>
+        
+    
+        
+        <div id="comment-1412187" class="comment comment-reply entry-author-comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    <img alt="Author Profile Page" src="http://blogs.perl.org/mt/mt-static/images/comment/mt_logo.png" width="16" height="16" />
+
+                    <span class="vcard author">Steven Haryanto</span> replied to <a href="http://blogs.perl.org/users/steven_haryanto/2014/07/benchmarking-several-ascii-table-generator-modules.html#comment-1412160">comment from jakoblog.de</a>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2014/07/benchmarking-several-ascii-table-generator-modules.html#comment-1412187"><abbr class="published" title="2014-07-11T10:33:39+07:00">July 11, 2014 10:33 AM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(1412187, 'Steven Haryanto')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>Merged.</p>
+        </div>
+    </div>
+</div>
+        
+    </div>
+        
+    
+    
+
+    
+    
+    <div class="comments-open" id="comments-open">
+        <h2 class="comments-open-header">Leave a comment</h2>
+        <div class="comments-open-content">
+
+        
+            <div id="comment-greeting"></div>
+
+            <form method="post" action="http://blogs.perl.org/mt/mt-comments.fcgi" name="comments_form" id="comments-form" onsubmit="return mtCommentOnSubmit(this)">
+                <input type="hidden" name="static" value="1" />
+                <input type="hidden" name="entry_id" value="6209" />
+                <input type="hidden" name="__lang" value="en" />
+                <input type="hidden" name="parent_id" value="" id="comment-parent-id" />
+                <input type="hidden" name="armor" value="1" />
+                <input type="hidden" name="preview" value="" />
+                <input type="hidden" name="sid" value="" />
+                <div id="comments-open-data">
+                    <div id="comment-form-name">
+                        <label for="comment-author">Name</label>
+                        <input id="comment-author" name="author" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-email">
+                        <label for="comment-email">Email Address</label>
+                        <input id="comment-email" name="email" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-url">
+                        <label for="comment-url">URL</label>
+                        <input id="comment-url" name="url" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-remember-me">
+                        <input type="checkbox" id="comment-bake-cookie" name="bakecookie" onclick="mtRememberMeOnClick(this)" value="1" accesskey="r" />
+                        <label for="comment-bake-cookie">Remember personal info?</label>
+                    </div>
+                </div>
+                <div id="comment-form-reply" style="display:none">
+                    <input type="checkbox" id="comment-reply" name="comment_reply" value="" onclick="mtSetCommentParentID()" />
+                    <label for="comment-reply" id="comment-reply-label"></label>
+                </div>
+                <div id="comments-open-text">
+                    <label for="comment-text">Comments
+                    (You may use HTML tags for style)</label>
+                    <textarea id="comment-text" name="text" rows="15" cols="50" onfocus="mtCommentFormOnFocus()"></textarea>
+                </div>
+                <div id="comments-open-captcha"></div>
+                <div id="comments-open-footer">
+                    <input type="submit" accesskey="v" name="preview_button" id="comment-preview" value="Preview" onclick="this.form.preview.value='1';" />
+                    <input type="submit" accesskey="s" name="post" id="comment-submit" value="Submit" />
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+    <script type="text/javascript">
+    <!--
+    mtAttachEvent("load", mtEntryOnLoad);
+    mtAttachEvent("unload", mtEntryOnUnload);
+    //-->
+    </script>
+    
+
+
+</div>
+
+
+
+</div><!-- #content-main -->
+            
+            <div id="content-aux">
+            
+                
+                <div class="module-aux pkg" id="module-aux-about-author-351">
+                <div class="module-inner">
+                    <h3>About Steven Haryanto</h3>
+                    <p><img class="authorpic" src="http://blogs.perl.org/mt/mt-static/support/assets_c/2012/08/gravatar-sharyanto-thumb-72x72-879.png" alt="user-pic" />
+	            A programmer (mostly Perl 5 nowadays).
+
+My CPAN ID: SHARYANTO. I'm sedusedan on perlmonks. My twitter is stevenharyanto (but I don't tweet much). Follow me on github: sharyanto.</p>
+                    <div class="more-link"><a href="http://blogs.perl.org/mt/mt-cp.fcgi?__mode=view&amp;id=351">More info &raquo;</a></div>
+                </div>
+                </div><!-- #module-aux-about-author -->
+
+
+
+
+                
+            
+            
+            <div class="module-aux pkg" id="module-aux-search">
+                <div class="module-inner">
+                    
+                    
+                    <h3>Search this blog</h3>
+                    
+                    
+					
+                    <div id="search-form-aux">
+                        <form method="get" action="http://blogs.perl.org/mt/mt-search.fcgi">
+                    
+                            <input type="hidden" name="IncludeBlogs" value="197" />
+                    
+                            <input type="hidden" name="limit" value="20" />
+                            <label for="search">Search</label>
+                            <input id="local-search" class="query" name="search" value="" />
+                            <input class="submit" type="submit" value="Go" />
+                        </form>
+                    </div><!-- #search-form-aux -->
+                </div>
+                </div><!-- #module-aux-search -->
+                    
+
+            
+            
+                
+                
+                
+                
+            
+
+            </div><!-- #content-aux -->
+
+
+
+        </div><!-- #content-inner -->
+        </div><!-- #content -->
+
+        <div id="footer">
+        <div id="footer-inner" class="pkg">
+            <ul>
+                <li class="first"><a href="http://github.com/blogs-perl-org/blogs.perl.org/issues">Feedback welcome</a></li>
+                <li>Hosted by <a href="http://dave.org.uk">Dave Cross</a> of <a href="http://mag-sol.com/">Magnum Solutions</a> and <a href="http://aaroncrane.co.uk/">Aaron Crane</a> of <a href="http://cutbot.net/">Cutbot</a></li>
+            </ul>
+            <ul>
+                <li class="first">Free blog hosting for users of the <a href="http://perl.org">Perl Programming Language</a></li>
+            </ul> 
+
+            <div class="powered-by"><a href="http://www.movabletype.com/" target="_blank">Powered by Movable Type</a></div>
+        </div><!-- #footer-inner -->
+        </div><!-- #footer -->
+            
+        </div><!-- #content-inner -->
+        </div><!-- #content -->
+        
+    </div><!-- #container-inner -->
+    </div><!-- #container -->
+
+    
+
+</body>
+</html>
+
+
+
+
+

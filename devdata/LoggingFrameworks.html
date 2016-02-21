@@ -1,0 +1,349 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" id="sixapart-standard">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <title>(Short, grossly incomplete) comparison of Perl logging frameworks | Of course I still use Perl [blogs.perl.org]</title>
+    <meta name="generator" content="Movable Type Pro 4.38" />
+    
+
+    
+    
+        
+        
+        
+        
+        
+        
+        
+        
+    <link href="http://blogs.perl.org/users/steven_haryanto/styles/reset.css" rel="stylesheet" type="text/css" />
+    <link href="http://blogs.perl.org/users/steven_haryanto/styles/base.css" rel="stylesheet" type="text/css" />
+    <link href="http://blogs.perl.org/mt/mt-static/plugins/GCPrettify/prettify.css" rel="stylesheet" type="text/css" />
+    <link rel="alternate" type="application/atom+xml" title="Entries" href="http://blogs.perl.org/users/steven_haryanto/atom.xml" />
+
+    <link rel="start" href="http://blogs.perl.org/users/steven_haryanto/" title="Home" />
+    <script type="text/javascript" src="http://blogs.perl.org/users/steven_haryanto/mt.js"></script>
+    <script type="text/javascript" src="http://blogs.perl.org/mt/mt-static/plugins/GCPrettify/prettify.js"></script>
+    <script type="text/javascript">mtAttachEvent('load', prettyPrint);</script>
+    <!--
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="http://blogs.perl.org/users/steven_haryanto/2010/11/short-grossly-incomplete-comparison-of-perl-logging-frameworks.html">
+<dc:title>(Short, grossly incomplete) comparison of Perl logging frameworks</dc:title>
+<dc:description>After doing this post on comparison of Perl serialization modules, I intended to continue with other comparisons, and even thought on setting up a wiki or creating/maintaining a section on the Official Perl 5 Wiki, which already has a Recommended...</dc:description>
+<dc:creator>Steven Haryanto</dc:creator>
+<dc:date>2010-11-18T10:55:53+07:00</dc:date>
+<license rdf:resource="http://creativecommons.org/licenses/by/3.0/" />
+</Work>
+<License rdf:about="http://creativecommons.org/licenses/by/3.0/">
+</License>
+</rdf:RDF>
+-->
+
+    
+
+
+    
+    <link rel="prev bookmark" href="http://blogs.perl.org/users/steven_haryanto/2010/10/sometimes-you-dont-want-circular-checking.html" title="Sometimes you *don't* want circular checking" />
+    <link rel="next bookmark" href="http://blogs.perl.org/users/steven_haryanto/2010/11/comparison-of-ini-format-modules-on-cpan.html" title="Comparison of INI-format modules on CPAN" />
+    
+    
+
+</head>
+<body class="">
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-56332-48']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+    <div id="container">
+    <div id="container-inner" class="pkg">
+        <div id="global-nav">
+        <div id="global-nav-inner">
+            <div id="global-nav-search">
+                <form method="get" action="http://blogs.perl.org/mt/mt-search.fcgi">
+                    <input type="hidden" name="limit" value="20" />
+                    <label for="search">Search</label>
+                    <input id="global-search" class="query" name="search" value="Search blogs.perl.org" onfocus="cleanGlobalSearch();" />
+                    <input class="submit" type="submit" value="Go" />
+                </form>
+            </div><!-- #global-nav-search -->
+
+            <ul id="global-nav-links">
+                <li><a href="/">blogs.perl.org</a></li>
+                <li><a href="http://www.perl.org/">perl.org</a></li>
+                <li><a href="http://perlnews.org/">perlnews.org</a></li>
+                <li><a href="http://www.pm.org/">pm.org</a></li>
+		<li id="navbar-signin-widget">
+<span id="navbar-signin-widget-content" class="widget-content"></span>
+</li>
+<script type="text/javascript">
+/* <![CDATA[ */
+mtAttachEvent('usersignin', mtUpdateNavbarSignInWidget);
+mtUpdateNavbarSignInWidget();
+/* ]]> */
+</script>
+            </ul><!-- #global-nav-links -->
+        </div><!-- #global-nav-inner -->
+        </div><!-- #global-nav -->
+        
+
+
+        
+        <div id="header" class="pkg">
+        <div id="header-inner">
+            <h1 id="site-title"><a href="http://blogs.perl.org/users/steven_haryanto/" accesskey="1">Of course I still use Perl</a></h1>
+            <div id="site-description">Adventures in Perl, which I have been in love-hate-love relationship with for more than a decade. A language that is dead, undead, alive, and above all: damn useful.</div>
+        </div><!-- #header-inner -->
+        </div><!-- #header -->
+        
+        <div id="content">
+        <div id="content-inner" class="pkg">
+            <div id="content-main">
+            
+
+
+<div class="entry" id="entry-1181">
+                        <h2 class="entry-title">(Short, grossly incomplete) comparison of Perl logging frameworks</h2>
+                        
+                        <div class="entry-meta-1 pkg">
+                            <span class="byline">By <a href="http://blogs.perl.org/users/steven_haryanto/" class="profile-link">Steven Haryanto</a></span>
+							<span class="dateline">on <span class="date" title="iso8601">November 18, 2010 10:55 AM</span></span>
+							
+						</div><!-- .entry-meta -->
+                        
+                        <div class="entry-body">
+                            <p>After doing <a href="http://blogs.perl.org/users/steven_haryanto/2010/09/comparison-of-perl-serialization-modules.html">this post on comparison of Perl serialization modules</a>, I intended to continue with other comparisons, and even thought on setting up a wiki or creating/maintaining a section on the <a href="https://www.socialtext.net/perl5/index.cgi">Official Perl 5 Wiki</a>, which already has a Recommended Modules section, although there is not much comparison being written for each recommendation. (Btw, I just noticed a change of domain for the Wiki, from perlfoundation.org to socialtext.net).</p>
+
+<p>But of course other tasks soon took precedence, so until the Wiki idea is realized, I thought I'll just continue posting on the blog as usual.</p>
+
+<p>There are **seriously** too many Perl logging frameworks out there. As the Log4perl FAQ mentions, "Writing a logging module is like a rite of passage for every Perl programmer, just like writing your own templating system."</p>
+
+<p>So I'm not going to pretend like I've evaluated even half of logging modules that are on CPAN. Instead I'm just going to include a few worth mentioning.</p>
+
+<p><strong>Log::Dispatch and Log::Log4perl. </strong>Two of the arguably most popular Perl logging frameworks are <a href="http://search.cpan.org/dist/Log-Dispatch">Log::Dispatch</a> and <a href="http://search.cpan.org/dist/Log-Log4perl">Log::Log4perl</a>. They are like the Moose of logging frameworks: mature, feature rich, flexible, has a lot of support/extra/3rd party modules, but... "slow". I quote the slow part because first of all, speed is not an issue for the majority of applications. And second of all, they are not relatively slow at all compared to other modules until they actually log stuff to output. For example, doing debug() on a warn level is around 1,5mils/sec with with Log4perl, and 3mils/sec with Log::Fast. But for actual logging, Log::Fast can be 10-45 times faster than these two.</p>
+
+<p><strong>Log::Any</strong>. For most people, Log::Dispatch and Log4perl should suffice. I personally haven't been unable to produce a case where I can't customize Log4perl they way I want. This shows the flexibility of the module. So the only thing left for flexibility is a thin wrapper where you might want to switch logging framework (kind of like Any::Moose for logging). There are a few of these on CPAN, but I prefer <a href="http://search.cpan.org/dist/Log-Any">Log::Any</a> (and I've also made a thin wrapper for *that*, <a href="http://search.cpan.org/dist/Log-Any-App">Log::Any::App</a>). RJBS also made one: <b><a href="http://search.cpan.org/dist/Log-Dispatchoulli">Log::Dispatchoulli</a></b>. You might be interested in using it if you are interested in using <a href="http://search.cpan.org/dist/String-Flogger">String::Flogger</a>.</p>
+
+<p>Performance-wise, as with Moose, there are other alternatives: <a href="http://search.cpan.org/dist/Log-Fast">Log::Fast</a>, for one. There are also a few other minimalistic frameworks, but I do not recommend using them as many of them are not flexible at all. Unless your application is really performance-critical.</p>
+
+<p>I've most probably left out a lot of possibly interesting alternatives.</p>
+                            
+                        </div><!-- .entry-body -->
+                        
+                        <div class="entry-meta-2 pkg">
+                            <ul>
+                                <li><a href="#comments">1 comment</a></li>
+                                <!-- <li><a href="http://blogs.perl.org/users/steven_haryanto/2010/11/short-grossly-incomplete-comparison-of-perl-logging-frameworks.html">0 votes</a></li> -->
+                            </ul>
+                        </div>
+                    </div><!-- #entry-1181 -->
+                    
+
+
+
+
+
+<div id="comments" class="comments">
+
+
+    
+    
+        
+    <h2 class="comments-header">1 Comment</h2>
+    
+    <div id="comments-content" class="comments-content" style="clear: left;">
+        
+        <div id="comment-5360" class="comment">
+    <div class="inner">
+        <div class="comment-header">
+            <div class="asset-meta">
+                <span class="byline">
+                    
+
+                    <span class="vcard author">Jay</span>
+
+                    | <a href="http://blogs.perl.org/users/steven_haryanto/2010/11/short-grossly-incomplete-comparison-of-perl-logging-frameworks.html#comment-5360"><abbr class="published" title="2010-11-19T06:34:54+07:00">November 19, 2010  6:34 AM</abbr></a>
+
+                    | <a title="Reply" href="javascript:void(0);" onclick="mtReplyCommentOnClick(5360, 'Jay')">Reply</a>
+
+                </span>
+            </div>
+        </div>
+        <div class="comment-content">
+            <p>Log::Message and Log::Message::Simple which are part of core since 5.10 thanks to being used in CPANPLUS.<br />
+</p>
+        </div>
+    </div>
+</div>
+        
+    </div>
+        
+    
+    
+
+    
+    
+    <div class="comments-open" id="comments-open">
+        <h2 class="comments-open-header">Leave a comment</h2>
+        <div class="comments-open-content">
+
+        
+            <div id="comment-greeting"></div>
+
+            <form method="post" action="http://blogs.perl.org/mt/mt-comments.fcgi" name="comments_form" id="comments-form" onsubmit="return mtCommentOnSubmit(this)">
+                <input type="hidden" name="static" value="1" />
+                <input type="hidden" name="entry_id" value="1181" />
+                <input type="hidden" name="__lang" value="en" />
+                <input type="hidden" name="parent_id" value="" id="comment-parent-id" />
+                <input type="hidden" name="armor" value="1" />
+                <input type="hidden" name="preview" value="" />
+                <input type="hidden" name="sid" value="" />
+                <div id="comments-open-data">
+                    <div id="comment-form-name">
+                        <label for="comment-author">Name</label>
+                        <input id="comment-author" name="author" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-email">
+                        <label for="comment-email">Email Address</label>
+                        <input id="comment-email" name="email" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-url">
+                        <label for="comment-url">URL</label>
+                        <input id="comment-url" name="url" size="30" value="" onfocus="mtCommentFormOnFocus()" />
+                    </div>
+                    <div id="comment-form-remember-me">
+                        <input type="checkbox" id="comment-bake-cookie" name="bakecookie" onclick="mtRememberMeOnClick(this)" value="1" accesskey="r" />
+                        <label for="comment-bake-cookie">Remember personal info?</label>
+                    </div>
+                </div>
+                <div id="comment-form-reply" style="display:none">
+                    <input type="checkbox" id="comment-reply" name="comment_reply" value="" onclick="mtSetCommentParentID()" />
+                    <label for="comment-reply" id="comment-reply-label"></label>
+                </div>
+                <div id="comments-open-text">
+                    <label for="comment-text">Comments
+                    (You may use HTML tags for style)</label>
+                    <textarea id="comment-text" name="text" rows="15" cols="50" onfocus="mtCommentFormOnFocus()"></textarea>
+                </div>
+                <div id="comments-open-captcha"></div>
+                <div id="comments-open-footer">
+                    <input type="submit" accesskey="v" name="preview_button" id="comment-preview" value="Preview" onclick="this.form.preview.value='1';" />
+                    <input type="submit" accesskey="s" name="post" id="comment-submit" value="Submit" />
+                </div>
+            </form>
+
+
+        </div>
+    </div>
+    <script type="text/javascript">
+    <!--
+    mtAttachEvent("load", mtEntryOnLoad);
+    mtAttachEvent("unload", mtEntryOnUnload);
+    //-->
+    </script>
+    
+
+
+</div>
+
+
+
+</div><!-- #content-main -->
+            
+            <div id="content-aux">
+            
+                
+                <div class="module-aux pkg" id="module-aux-about-author-351">
+                <div class="module-inner">
+                    <h3>About Steven Haryanto</h3>
+                    <p><img class="authorpic" src="http://blogs.perl.org/mt/mt-static/support/assets_c/2012/08/gravatar-sharyanto-thumb-72x72-879.png" alt="user-pic" />
+	            A programmer (mostly Perl 5 nowadays).</p>
+                    <div class="more-link"><a href="http://blogs.perl.org/mt/mt-cp.fcgi?__mode=view&amp;id=351">More info &raquo;</a></div>
+                </div>
+                </div><!-- #module-aux-about-author -->
+
+
+
+
+                
+            
+            
+            <div class="module-aux pkg" id="module-aux-search">
+                <div class="module-inner">
+                    
+                    
+                    <h3>Search this blog</h3>
+                    
+                    
+					
+                    <div id="search-form-aux">
+                        <form method="get" action="http://blogs.perl.org/mt/mt-search.fcgi">
+                    
+                            <input type="hidden" name="IncludeBlogs" value="197" />
+                    
+                            <input type="hidden" name="limit" value="20" />
+                            <label for="search">Search</label>
+                            <input id="local-search" class="query" name="search" value="" />
+                            <input class="submit" type="submit" value="Go" />
+                        </form>
+                    </div><!-- #search-form-aux -->
+                </div>
+                </div><!-- #module-aux-search -->
+                    
+
+            
+            
+                
+                
+                
+                
+            
+
+            </div><!-- #content-aux -->
+
+
+
+        </div><!-- #content-inner -->
+        </div><!-- #content -->
+
+        <div id="footer">
+        <div id="footer-inner" class="pkg">
+            <ul>
+                <li class="first"><a href="http://github.com/blogs-perl-org/blogs.perl.org/issues">Feedback welcome</a></li>
+                <li>Hosted by <a href="http://dave.org.uk">Dave Cross</a> of <a href="http://mag-sol.com/">Magnum Solutions</a> and <a href="http://aaroncrane.co.uk/">Aaron Crane</a> of <a href="http://cutbot.net/">Cutbot</a></li>
+            </ul>
+            <ul>
+                <li class="first">Free blog hosting for users of the <a href="http://perl.org">Perl Programming Language</a></li>
+            </ul> 
+
+            <div class="powered-by"><a href="http://www.movabletype.com/" target="_blank">Powered by Movable Type</a></div>
+        </div><!-- #footer-inner -->
+        </div><!-- #footer -->
+            
+        </div><!-- #content-inner -->
+        </div><!-- #content -->
+        
+    </div><!-- #container-inner -->
+    </div><!-- #container -->
+
+    
+
+</body>
+</html>
+
+
+
+
+
